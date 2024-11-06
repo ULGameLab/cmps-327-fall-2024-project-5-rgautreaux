@@ -137,7 +137,7 @@ public class PathFinder
 
                 //if this neighboring tile is not traversable or
                 //closed/done you SKIP to the next neighboring tile
-                if (DoneList.Contains(neighbor) || !current.tile.Adjacents.Contains(neighbor))
+                if (DoneList.Contains(neighbor) || !current.tile.Adjacents.Contains(neighbor.tile))
                 {
                     //Move on to next neighbor
                     DoneList.Add(neighbor);
