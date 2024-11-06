@@ -1,6 +1,13 @@
-﻿using System.Collections;
+﻿using NUnit.Framework;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.IO;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
 
 // FSM States for the enemy
 public enum EnemyState { STATIC, CHASE, REST, MOVING, DEFAULT };
@@ -131,12 +138,186 @@ public class Enemy : MonoBehaviour
     // TODO: Enemy chases the player when it is nearby
     private void HandleEnemyBehavior2()
     {
-        
+        //This enemy will keep walking in random directions (like the previous) but will chase the player if it is
+        //nearby (controlled by “visionDistance” parameter in the Enemy script).
+        switch (state)
+        {
+            case EnemyState.DEFAULT: // generate random path 
+
+                //Changed the color to blue to differentiate from other enemies
+                material.color = Color.blue;
+
+                if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, 20);
+
+                if (path.Count > 0)
+                {
+                    targetTile = path.Dequeue();
+                    state = EnemyState.MOVING;
+                }
+                break;
+
+            case EnemyState.MOVING:
+                //move
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+
+                //if target reached
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                {
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+
+                //if target is seen
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= visionDistance)
+                {
+
+                    //When Enemy2 sees the player, it selects the last tile the Player was at as their target tile.
+
+
+                    /*
+                        Queue<Tile> targetPath = targetTile.GetComponent<Enemy>().currentTile.tileList;
+                        Tile lastSeen = targetPath[0];
+                    */
+
+                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
+                    Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
+                    Tile newTarget = pathFinder.RandomPath(lastSeen, stepsAway);
+
+                    targetTile = newTarget;
+                    currentTile = targetTile;
+
+                    state = EnemyState.CHASE;
+                }
+
+                break;
+
+            case EnemyState.CHASE:
+                //move
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+
+                //Chase Target
+                //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) > 0.05f)
+                {
+                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
+                    if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, stepsAway);
+
+                    if (path.Count > 0)
+                    {
+                        targetTile = path.Dequeue();
+                        state = EnemyState.MOVING;
+                    }
+                }
+                else
+                {
+                    //Target is reached
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+
+            default:
+                state = EnemyState.DEFAULT;
+                break;
+        }
+
     }
 
     // TODO: Third behavior (Describe what it does)
+
+    //When Enemy3 sees the player, it selects a tile which is a few tiles away 
+    //(for example 2 tiles away) from the Player as their target tile.The enemy now
+    //uses pathfinder to find the path to that tile
     private void HandleEnemyBehavior3()
     {
+        switch (state)
+        {
+            case EnemyState.DEFAULT: // generate random path 
+
+                //Changed the color to yellow to differentiate from other enemies
+                material.color = Color.yellow;
+
+                if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, 20);
+
+                if (path.Count > 0)
+                {
+                    targetTile = path.Dequeue();
+                    state = EnemyState.MOVING;
+                }
+                break;
+
+            case EnemyState.MOVING:
+                //move
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+
+                //if target reached
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                {
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+
+                //if target is seen
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= visionDistance)
+                {
+
+                    //When Enemy3 sees the player,it selects a tile which is a few tiles away 
+                    //(for example 2 tiles away) from the Player as their target tile.
+
+
+
+                    /*
+                        Queue<Tile> targetPath = targetTile.GetComponent<Enemy>().currentTile.tileList;
+                        Tile lastSeenOffset = targetPath[2];
+                    */
+
+                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position)) + 2;
+                    Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
+                    Tile newTarget = pathFinder.RandomPath(lastSeen, stepsAway);
+
+                    targetTile = newTarget;
+                    currentTile = targetTile;
+
+                    state = EnemyState.CHASE;
+                }
+
+                break;
+
+            case EnemyState.CHASE:
+                //move
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+
+                //Chase Target
+                //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) > 0.05f)
+                {
+                    Vector3.Distance(transform.position, targetTile.gameObject.transform.position);
+
+                    //PURSUIT
+                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
+                    if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, stepsAway);
+
+                    if (path.Count > 0)
+                    {
+                        targetTile = path.Dequeue();
+                        state = EnemyState.MOVING;
+                    }
+                }
+                else
+                {
+                    //Target is reached
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+
+            default:
+                state = EnemyState.DEFAULT;
+                break;
+        }
+    }
 
     }
 }

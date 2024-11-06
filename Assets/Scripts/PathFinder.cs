@@ -53,6 +53,7 @@ public class PathFinder
     public PathFinder()
     {
         goalTile = null;
+
     }
 
     // TODO: Find the path based on A-Star Algorithm
