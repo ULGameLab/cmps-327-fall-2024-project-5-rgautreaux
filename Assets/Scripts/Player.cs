@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
 
                 if (path.Count <= 0)
                 {
-                    path = pathFinder.FindPathAStarEvadeEnemy(currentTile, mapGenerator.goal);
+                    path = pathFinder.FindPathAStarEvadeEnemy(currentTile, mapGenerator.goal, pathFinder.GetEnemyGameObject());
                     enemyCloseCounter = 0;
                 }
 
