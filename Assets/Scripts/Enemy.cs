@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
     protected EnemyState state = EnemyState.DEFAULT;
     protected Material material;
 
-    public EnemyBehavior behavior = EnemyBehavior.EnemyBehavior1; 
+    public EnemyBehavior behavior = EnemyBehavior.EnemyBehavior1;
 
     // Start is called before the first frame update
     void Start()
@@ -59,7 +59,7 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        switch(behavior)
+        switch (behavior)
         {
             case EnemyBehavior.EnemyBehavior1:
                 HandleEnemyBehavior1();
@@ -91,7 +91,7 @@ public class Enemy : MonoBehaviour
         int randomIndex = 0;
         while (newTarget == null || !newTarget.mapTile.Walkable)
         {
-            randomIndex = (int)(Random.value * mapGenerator.width * mapGenerator.height - 1);
+            randomIndex = (int)(UnityEngine.Random.value * mapGenerator.width * mapGenerator.height - 1);
             newTarget = GameObject.Find("MapGenerator").transform.GetChild(randomIndex).GetComponent<Tile>();
         }
         return newTarget;
@@ -103,10 +103,11 @@ public class Enemy : MonoBehaviour
         switch (state)
         {
             case EnemyState.DEFAULT: // generate random path 
-                
+
                 //Changed the color to white to differentiate from other enemies
                 material.color = Color.white;
-                
+
+
                 if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, 20);
 
                 if (path.Count > 0)
@@ -120,7 +121,7 @@ public class Enemy : MonoBehaviour
                 //move
                 velocity = targetTile.gameObject.transform.position - transform.position;
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
-                
+
                 //if target reached
                 if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
                 {
@@ -182,9 +183,9 @@ public class Enemy : MonoBehaviour
 
                     int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
                     Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
-                    Tile newTarget = pathFinder.RandomPath(lastSeen, stepsAway);
+                    Queue<Tile> newTargetPath = pathFinder.RandomPath(lastSeen, stepsAway);
 
-                    targetTile = newTarget;
+                    targetTile = newTargetPath.Dequeue();
                     currentTile = targetTile;
 
                     state = EnemyState.CHASE;
@@ -216,6 +217,8 @@ public class Enemy : MonoBehaviour
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
                 }
+
+                break;
 
             default:
                 state = EnemyState.DEFAULT;
@@ -275,9 +278,9 @@ public class Enemy : MonoBehaviour
 
                     int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position)) + 2;
                     Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
-                    Tile newTarget = pathFinder.RandomPath(lastSeen, stepsAway);
+                    Queue<Tile> newTargetPath = pathFinder.RandomPath(lastSeen, stepsAway);
 
-                    targetTile = newTarget;
+                    targetTile =  newTargetPath.Dequeue();
                     currentTile = targetTile;
 
                     state = EnemyState.CHASE;
@@ -313,11 +316,11 @@ public class Enemy : MonoBehaviour
                     state = EnemyState.DEFAULT;
                 }
 
+                break;
+
             default:
                 state = EnemyState.DEFAULT;
                 break;
         }
-    }
-
     }
 }

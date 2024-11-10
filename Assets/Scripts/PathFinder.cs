@@ -12,6 +12,7 @@ using static UnityEngine.EventSystems.EventTrigger;
 using System.Drawing;
 using System.IO;
 using UnityEditor.Experimental.GraphView;
+using JetBrains.Annotations;
 
 public class Node
 {
@@ -86,7 +87,7 @@ public class PathFinder
 
                 //if this neighboring tile is not traversable or
                 //closed/done you SKIP to the next neighboring tile
-                if (DoneList.Contains(neighbor) || !current.tile.Adjacents.Contains(neighbor))
+                if (DoneList.Contains(neighbor) || !current.tile.Adjacents.Contains(neighbor.tile))
                 {
                     //Move on to next neighbor
                     DoneList.Add(neighbor);
@@ -119,6 +120,21 @@ public class PathFinder
             }
         }
         return new Queue<Tile>(); // Returns an empty Path if no path is found
+    }
+
+    private Queue<Tile> RetracePath(Node current)
+    {
+        throw new NotImplementedException();
+    }
+
+    private double TileDistance(Tile tile1, Tile tile2)
+    {
+        throw new NotImplementedException();
+    }
+
+    private double HeuristicsDistance(Tile tile1, Tile tile2)
+    {
+        throw new NotImplementedException();
     }
 
     public GameObject GetEnemyGameObject()
@@ -324,5 +340,10 @@ public class PathFinder
             list[t] = list[r];
             list[r] = tmp;
         }
+    }
+
+    internal Queue<Tile> RandomPath(Tile currentTile, int stepsAway)
+    {
+        throw new NotImplementedException();
     }
 }
