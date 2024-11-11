@@ -20,7 +20,7 @@ public class Node
     public Node enemyNode = null;   //enemy node
 
     public GameObject enemyGameObject;
-    Transform enemyLocation;
+    public Transform enemyLocation;
 
     public List<Node> EnemyPath;
 
@@ -43,11 +43,11 @@ public class Node
 
 public class PathFinder
 {
-    List<Node> TODOList = new List<Node>();
-    List<Node> DoneList = new List<Node>();
-    private List<Node> EnemyPath;
-    Tile goalTile;
-    GameObject enemyGameObject;
+    List<Node> TODOList = new();
+    List<Node> DoneList = new();
+    public List<Node> EnemyPath;
+    public Tile goalTile;
+    public GameObject enemyGameObject;
 
 
     // This is the constructor
@@ -289,7 +289,7 @@ public class PathFinder
         // Retrace path from a given Node back to the start Node
         Queue<Tile> RetracePath(Node node)
         {
-            List<Tile> tileList = new List<Tile>();
+            List<Tile> tileList = new();
             Node nodeIterator = node;
             while (nodeIterator.cameFrom != null)
             {
@@ -305,7 +305,7 @@ public class PathFinder
         // Generate a Random Path. Used for enemies
         public Queue<Tile> RandomPath(Tile start, int stepNumber)
         {
-            List<Tile> tileList = new List<Tile>();
+        List<Tile> tileList = new();
             Tile currentTile = start;
             for (int i = 0; i < stepNumber; i++)
             {
@@ -322,14 +322,14 @@ public class PathFinder
                 else
                 {
                     nextTile = null;
-                    List<Tile> adjacentList = new List<Tile>(currentTile.Adjacents);
+                List<Tile> adjacentList = new(currentTile.Adjacents);
                     ShuffleTiles<Tile>(adjacentList);
                     if (tileList.Count <= 0) nextTile = adjacentList[0];
                     else
                     {
                         foreach (Tile tile in adjacentList)
                         {
-                            if (tile != tileList[tileList.Count - 1])
+                        if (tile != tileList[tileList.Count - 1])
                             {
                                 nextTile = tile;
                                 break;

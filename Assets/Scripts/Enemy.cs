@@ -88,10 +88,9 @@ public class Enemy : MonoBehaviour
     Tile FindWalkableTile()
     {
         Tile newTarget = null;
-        int randomIndex = 0;
         while (newTarget == null || !newTarget.mapTile.Walkable)
         {
-            randomIndex = (int)(UnityEngine.Random.value * mapGenerator.width * mapGenerator.height - 1);
+            int randomIndex = (int)(UnityEngine.Random.value * mapGenerator.width * mapGenerator.height - 1);
             newTarget = GameObject.Find("MapGenerator").transform.GetChild(randomIndex).GetComponent<Tile>();
         }
         return newTarget;
