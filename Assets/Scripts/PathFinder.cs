@@ -181,13 +181,16 @@ public class PathFinder
 
             foreach (Tile nextEnemy in enemyTile.Adjacents)
             {
-                
+
                 Node enemyNeighbor = TODOList[1];
 
                 //if player makes contact with the enemy, enforce heavy cost
                 if (current.tile == enemyTile)
                 {
                     EnemyDistance(current.tile, enemyTile);
+                    return RetracePath(current); // Trace through the path
+
+
                 }
 
                 //if this neighboring tile is not traversable or
@@ -197,6 +200,8 @@ public class PathFinder
                     //Move on to next neighbor
                     DoneList.Add(enemyNeighbor);
                     TODOList.RemoveAt(1);
+                    return RetracePath(current); // Trace through the path
+
                 }
 
                 //if the new path to this neighbor tile is shorter OR
@@ -207,6 +212,9 @@ public class PathFinder
                 DoneList.Add(enemyNeighbor);
                 TODOList.RemoveAt(1);
                 double newPath = TileDistance(current.tile, enemyTile);
+
+                return RetracePath(current); // Trace through the path
+
 
                 if (newPath < oldPath || !TODOList.Contains(enemyNeighbor))
                 {
@@ -220,10 +228,16 @@ public class PathFinder
                     if (!TODOList.Contains(enemyNeighbor))
                     {
                         DoneList.Add(enemyNeighbor);
+                        return RetracePath(current); // Trace through the path
+
                     }
 
+                    return RetracePath(current); // Trace through the path
+
                 }
+                return RetracePath(current); // Trace through the path
             }
+
             return new Queue<Tile>(); // Returns an empty Path
         }
 
@@ -284,6 +298,7 @@ public class PathFinder
             }
             return new Queue<Tile>(tileList);
         }
+    }
 
 
 
@@ -327,7 +342,7 @@ public class PathFinder
             }
             return new Queue<Tile>(tileList);
         }
-    }
+
 
     private static void ShuffleTiles<T>(List<T> list)
     {
@@ -340,10 +355,5 @@ public class PathFinder
             list[t] = list[r];
             list[r] = tmp;
         }
-    }
-
-    internal Queue<Tile> RandomPath(Tile currentTile, int stepsAway)
-    {
-        throw new NotImplementedException();
     }
 }
