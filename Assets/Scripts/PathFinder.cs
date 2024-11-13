@@ -122,21 +122,6 @@ public class PathFinder
         return new Queue<Tile>(); // Returns an empty Path if no path is found
     }
 
-    private Queue<Tile> RetracePath(Node current)
-    {
-        throw new NotImplementedException();
-    }
-
-    private double TileDistance(Tile tile1, Tile tile2)
-    {
-        throw new NotImplementedException();
-    }
-
-    private double HeuristicsDistance(Tile tile1, Tile tile2)
-    {
-        throw new NotImplementedException();
-    }
-
     public GameObject GetEnemyGameObject()
     {
         return enemyGameObject;
@@ -213,7 +198,7 @@ public class PathFinder
                 TODOList.RemoveAt(1);
                 double newPath = TileDistance(current.tile, enemyTile);
 
-                return RetracePath(current); // Trace through the path
+                // return RetracePath(current); // Trace through the path
 
 
                 if (newPath < oldPath || !TODOList.Contains(enemyNeighbor))
@@ -235,14 +220,21 @@ public class PathFinder
                     return RetracePath(current); // Trace through the path
 
                 }
+
                 return RetracePath(current); // Trace through the path
             }
 
-            return new Queue<Tile>(); // Returns an empty Path
+
+            return RetracePath(current); // Trace through the path
         }
 
-        // Manhattan Distance with horizontal/vertical cost of 10
-        double HeuristicsDistance(Tile currentTile, Tile goalTile)
+        return new Queue<Tile>(); // Returns an empty Path if no path is found
+
+    }
+
+
+    // Manhattan Distance with horizontal/vertical cost of 10
+    public double HeuristicsDistance(Tile currentTile, Tile goalTile)
         {
             int xdist = Math.Abs(goalTile.indexX - currentTile.indexX);
             int ydist = Math.Abs(goalTile.indexY - currentTile.indexY);
@@ -254,7 +246,7 @@ public class PathFinder
 
         // Manhattan Distance with horizontal/vertical cost of 30 due to
         // enemy presence, different from Heuristic Distance
-        double EnemyDistance(Tile currentTile, Tile goalTile)
+       public  double EnemyDistance(Tile currentTile, Tile goalTile)
         {
             int xdist = Math.Abs(goalTile.indexX - currentTile.indexX);
             int ydist = Math.Abs(goalTile.indexY - currentTile.indexY);
@@ -266,7 +258,7 @@ public class PathFinder
 
         // Manhattan Distance with horizontal/vertical cost of 30 due to
         // enemy presence, different from Heuristic Distance
-        double EnemyNeighborDist(Tile currentTile, Tile goalTile)
+        public double EnemyNeighborDist(Tile currentTile, Tile goalTile)
         {
             int xdist = Math.Abs(goalTile.indexX - currentTile.indexX);
             int ydist = Math.Abs(goalTile.indexY - currentTile.indexY);
@@ -277,7 +269,7 @@ public class PathFinder
 
 
         // Calculate distance between current and neighbor
-        double TileDistance(Tile currentTile, Tile goalTile)
+        public double TileDistance(Tile currentTile, Tile goalTile)
         {
             int xdist = Math.Abs(goalTile.indexX - currentTile.indexX);
             int ydist = Math.Abs(goalTile.indexY - currentTile.indexY);
@@ -287,7 +279,7 @@ public class PathFinder
         }
 
         // Retrace path from a given Node back to the start Node
-        Queue<Tile> RetracePath(Node node)
+       public Queue<Tile> RetracePath(Node node)
         {
             List<Tile> tileList = new();
             Node nodeIterator = node;
@@ -298,7 +290,7 @@ public class PathFinder
             }
             return new Queue<Tile>(tileList);
         }
-    }
+    
 
 
 

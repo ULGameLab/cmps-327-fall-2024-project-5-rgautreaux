@@ -122,7 +122,7 @@ public class Enemy : MonoBehaviour
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
 
                 //if target reached
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= 0.05f)
                 {
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
@@ -162,27 +162,20 @@ public class Enemy : MonoBehaviour
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
 
                 //if target reached
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= 0.05f)
                 {
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
                 }
 
                 //if target is seen
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= visionDistance)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= visionDistance)
                 {
 
                     //When Enemy2 sees the player, it selects the last tile the Player was at as their target tile.
 
-
-                    /*
-                        Queue<Tile> targetPath = targetTile.GetComponent<Enemy>().currentTile.tileList;
-                        Tile lastSeen = targetPath[0];
-                    */
-
-                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
                     Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
-                    Queue<Tile> newTargetPath = pathFinder.RandomPath(lastSeen, stepsAway);
+                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
 
                     targetTile = newTargetPath.Dequeue();
                     currentTile = targetTile;
@@ -199,10 +192,15 @@ public class Enemy : MonoBehaviour
 
                 //Chase Target
                 //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) > 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) > 0.05f)
                 {
                     int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
-                    if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, stepsAway);
+                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
+                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
+
+                    targetTile = newTargetPath.Dequeue();
+                    currentTile = targetTile;
+                    if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, lastSeen);
 
                     if (path.Count > 0)
                     {
@@ -255,14 +253,14 @@ public class Enemy : MonoBehaviour
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
 
                 //if target reached
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= 0.05f)
                 {
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
                 }
 
                 //if target is seen
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= visionDistance)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= visionDistance)
                 {
 
                     //When Enemy3 sees the player,it selects a tile which is a few tiles away 
@@ -275,9 +273,8 @@ public class Enemy : MonoBehaviour
                         Tile lastSeenOffset = targetPath[2];
                     */
 
-                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position)) + 2;
-                    Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
-                    Queue<Tile> newTargetPath = pathFinder.RandomPath(lastSeen, stepsAway);
+                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile.Adjacents[3];
+                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
 
                     targetTile =  newTargetPath.Dequeue();
                     currentTile = targetTile;
@@ -294,13 +291,13 @@ public class Enemy : MonoBehaviour
 
                 //Chase Target
                 //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
-                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) > 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) > 0.05f)
                 {
-                    Vector3.Distance(transform.position, targetTile.gameObject.transform.position);
+                    Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position);
 
                     //PURSUIT
-                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
-                    if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, stepsAway);
+                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
+                    if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, lastSeen);
 
                     if (path.Count > 0)
                     {
