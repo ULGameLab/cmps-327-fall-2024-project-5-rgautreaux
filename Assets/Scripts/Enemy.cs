@@ -122,7 +122,7 @@ public class Enemy : MonoBehaviour
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
 
                 //if target reached
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) <= 0.05f)
                 {
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
@@ -162,19 +162,19 @@ public class Enemy : MonoBehaviour
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
 
                 //if target reached
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) <= 0.05f)
                 {
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
                 }
 
                 //if target is seen
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= visionDistance)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) <= visionDistance)
                 {
 
                     //When Enemy2 sees the player, it selects the last tile the Player was at as their target tile.
 
-                    Tile lastSeen = targetTile.GetComponent<Enemy>().currentTile;
+                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
                     Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
 
                     targetTile = newTargetPath.Dequeue();
@@ -192,9 +192,8 @@ public class Enemy : MonoBehaviour
 
                 //Chase Target
                 //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) > 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) > 0.05f)
                 {
-                    int stepsAway = ((int)Vector3.Distance(transform.position, targetTile.gameObject.transform.position));
                     Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
                     Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
 
@@ -253,25 +252,18 @@ public class Enemy : MonoBehaviour
                 transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
 
                 //if target reached
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) <= 0.05f)
                 {
                     currentTile = targetTile;
                     state = EnemyState.DEFAULT;
                 }
 
                 //if target is seen
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) <= visionDistance)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) <= visionDistance)
                 {
 
                     //When Enemy3 sees the player,it selects a tile which is a few tiles away 
                     //(for example 2 tiles away) from the Player as their target tile.
-
-
-
-                    /*
-                        Queue<Tile> targetPath = targetTile.GetComponent<Enemy>().currentTile.tileList;
-                        Tile lastSeenOffset = targetPath[2];
-                    */
 
                     Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile.Adjacents[3];
                     Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
@@ -291,10 +283,8 @@ public class Enemy : MonoBehaviour
 
                 //Chase Target
                 //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
-                if (Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position) > 0.05f)
+                if (Vector3.Distance(transform.position, playerGameObject.transform.position) > 0.05f)
                 {
-                    Vector3.Distance(transform.position, playerGameObject.gameObject.transform.position);
-
                     //PURSUIT
                     Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
                     if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, lastSeen);

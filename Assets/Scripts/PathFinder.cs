@@ -13,6 +13,10 @@ using System.Drawing;
 using System.IO;
 using UnityEditor.Experimental.GraphView;
 using JetBrains.Annotations;
+using UnityEngine.XR;
+using static UnityEngine.Networking.UnityWebRequest;
+using UnityEditor;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class Node
 {
@@ -43,9 +47,11 @@ public class Node
 
 public class PathFinder
 {
-    List<Node> TODOList = new();
-    List<Node> DoneList = new();
-    public List<Node> EnemyPath;
+    public List<Node> TODOList = new();
+    public List<Node> DoneList = new();
+    public List<Node> Neighbors = new();
+    public List<Node> EnemyPath = new();
+    public List<Node> NeighborEnemies = new();
     public Tile goalTile;
     public GameObject enemyGameObject;
 
@@ -62,7 +68,7 @@ public class PathFinder
     {
         TODOList = new List<Node>();
         DoneList = new List<Node>();
-        //Neighbors = new List<Node>();
+        Neighbors = new List<Node>();
 
         TODOList.Add(new Node(start, 0, null, 0, 0));
         goalTile = goal;
@@ -70,7 +76,11 @@ public class PathFinder
         while (TODOList.Count > 0)
         {
             TODOList.Sort((x, y) => (x.priority.CompareTo(y.priority))); // This will keep the TODO List sorted based on the F cost
+
+            //Look for the lowest F cost square on the TODO list. We refer to this as the current square.
             Node current = TODOList[0];
+
+            //Switch it to the DONE list
             DoneList.Add(current);
             TODOList.RemoveAt(0);
 
@@ -79,43 +89,57 @@ public class PathFinder
                 return RetracePath(current);  // Returns the Path if goal is reached
             }
 
-            // for each neighboring tile calculate the costs
+
+            // For each of the 8 squares adjacent to this current square, calculate the costs
             // You just need to fill code inside this foreach only
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-                Node neighbor = TODOList[1];
+                Tile findNeighbors = nextTile;
+                Neighbors.Add(new Node(findNeighbors, 0, null, 0, 0));
+                Node neighbor = Neighbors[0];
 
-                //if this neighboring tile is not traversable or
-                //closed/done you SKIP to the next neighboring tile
+
+                //If it is not walkable or if it is on the DONE list, ignore it.
                 if (DoneList.Contains(neighbor) || !current.tile.Adjacents.Contains(neighbor.tile))
                 {
                     //Move on to next neighbor
-                    DoneList.Add(neighbor);
-                    TODOList.RemoveAt(1);
+                    Neighbors.RemoveAt(0);
                 }
-
-                //if the new path to this neighbor tile is shorter OR
-                //this neighbor is not available/open, then edit the f
-                //cost and path accordingly
-
-                double oldPath = TileDistance(current.tile, neighbor.tile);
-                DoneList.Add(neighbor);
-                TODOList.RemoveAt(1);
-                double newPath = TileDistance(current.tile, neighbor.tile);
-
-                if (newPath < oldPath || !TODOList.Contains(neighbor))
+                // If it isn’t on the TODO list, add it to the TODO list. Make the current square the parent of 
+                // this square.Record the F, G, and H costs of the square
+                else if (!TODOList.Contains(neighbor))
                 {
-                    //set F Cost of neighbor
-                    neighbor.priority = HeuristicsDistance(current.tile, neighbor.tile);
-
-                    //set parent of neighor to current
+                    TODOList.Add(neighbor);
                     neighbor.cameFrom = current;
 
-                    //add available/open nodes to TODO List
-                    if (!TODOList.Contains(neighbor))
+                    neighbor.priority = HeuristicsDistance(current.tile, neighbor.tile);
+                    neighbor.costSoFar = HeuristicsDistance(start, neighbor.tile);
+                    neighbor.remainingDist = HeuristicsDistance(neighbor.tile, goal);
+
+                }
+                // If it is on the TODO list already, check to see if this path to that square is better,using G
+                // cost as the measure
+                else if (TODOList.Contains(neighbor))
+                {
+                    // A lower G cost means that this is a better path.
+
+                    TODOList.Sort((x, y) => (x.costSoFar.CompareTo(y.costSoFar))); //Resort the list to compare G score
+                    if (neighbor.costSoFar < current.costSoFar)
                     {
-                        DoneList.Add(neighbor);
+                        //If the G cost is lower, change the parent of the square to the current square, and recalculate the G and F scores of the
+                        // square.
+
+                        neighbor.cameFrom = current;
+                        neighbor.priority = HeuristicsDistance(current.tile, neighbor.tile);
+                        neighbor.costSoFar = HeuristicsDistance(start, neighbor.tile);
+
                     }
+                }
+                else
+                {
+                    neighbor.priority = HeuristicsDistance(current.tile, neighbor.tile);
+                    neighbor.costSoFar = HeuristicsDistance(start, neighbor.tile);
+                    neighbor.remainingDist = HeuristicsDistance(neighbor.tile, goal);
                 }
             }
         }
@@ -135,6 +159,7 @@ public class PathFinder
         TODOList = new List<Node>();
         DoneList = new List<Node>();
         EnemyPath = new List<Node>();
+        NeighborEnemies = new List<Node>();
 
         Tile enemyTile = enemyGameObject.GetComponent<Enemy>().currentTile;
 
@@ -154,8 +179,6 @@ public class PathFinder
             DoneList.Add(current);
             TODOList.RemoveAt(0);
 
-            EnemyPath.RemoveAt(0);
-
             // for each neighboring tile calculate the costs
             // You just need to fill code inside this foreach only
             // Just increase the F cost of the enemy tile and the tiles around it by a certain ammount (say 30)
@@ -166,66 +189,60 @@ public class PathFinder
 
             foreach (Tile nextEnemy in enemyTile.Adjacents)
             {
-
-                Node enemyNeighbor = TODOList[1];
+                Tile eNeighbor = nextEnemy;
+                NeighborEnemies.Add(new Node(eNeighbor, 0, null, 0, 0));
+                Node enemyNeighbor = NeighborEnemies[0];
 
                 //if player makes contact with the enemy, enforce heavy cost
                 if (current.tile == enemyTile)
                 {
-                    EnemyDistance(current.tile, enemyTile);
-                    return RetracePath(current); // Trace through the path
-
-
+                    enemy.priority = EnemyDistance(current.tile, enemy.tile);
+                    enemy.costSoFar = EnemyDistance(start, enemy.tile);
+                    enemy.remainingDist = EnemyDistance(enemy.tile, goal);
                 }
-
-                //if this neighboring tile is not traversable or
-                //closed/done you SKIP to the next neighboring tile
-                if (DoneList.Contains(enemyNeighbor) || !current.tile.Adjacents.Contains(enemyNeighbor.tile))
+                //If it is not walkable or if it is on the DONE list, ignore it.
+                else if (DoneList.Contains(enemyNeighbor) || !current.tile.Adjacents.Contains(enemyNeighbor.tile))
                 {
                     //Move on to next neighbor
-                    DoneList.Add(enemyNeighbor);
-                    TODOList.RemoveAt(1);
-                    return RetracePath(current); // Trace through the path
-
-                }
-
-                //if the new path to this neighbor tile is shorter OR
-                //this neighbor is not available/open, then edit the f
-                //cost and path accordingly
-
-                double oldPath = TileDistance(current.tile, enemyTile);
-                DoneList.Add(enemyNeighbor);
-                TODOList.RemoveAt(1);
-                double newPath = TileDistance(current.tile, enemyTile);
-
-                // return RetracePath(current); // Trace through the path
-
-
-                if (newPath < oldPath || !TODOList.Contains(enemyNeighbor))
+                    NeighborEnemies.RemoveAt(0);
+                }// If it isn’t on the TODO list, add it to the TODO list. Make the current square the parent of 
+                // this square.Record the F, G, and H costs of the square
+                else if (!TODOList.Contains(enemyNeighbor))
                 {
-                    //set F Cost of neighbor (HIGHER than usual)
-                    enemyNeighbor.priority = EnemyNeighborDist(current.tile, enemyTile);
-
-                    //set parent of neighor to current
+                    TODOList.Add(enemyNeighbor);
                     enemyNeighbor.cameFrom = current;
 
-                    //add available/open nodes to TODO List
-                    if (!TODOList.Contains(enemyNeighbor))
-                    {
-                        DoneList.Add(enemyNeighbor);
-                        return RetracePath(current); // Trace through the path
-
-                    }
-
-                    return RetracePath(current); // Trace through the path
+                    enemyNeighbor.priority = EnemyNeighborDist(current.tile, enemyNeighbor.tile);
+                    enemyNeighbor.costSoFar = EnemyNeighborDist(start, enemyNeighbor.tile);
+                    enemyNeighbor.remainingDist = EnemyNeighborDist(enemyNeighbor.tile, goal);
 
                 }
+                // If it is on the TODO list already, check to see if this path to that square is better,using G
+                // cost as the measure
+                else if (TODOList.Contains(enemyNeighbor))
+                {
+                    // A lower G cost means that this is a better path.
 
-                return RetracePath(current); // Trace through the path
+                    TODOList.Sort((x, y) => (x.costSoFar.CompareTo(y.costSoFar))); //Resort the list to compare G score
+                    if (enemyNeighbor.costSoFar < current.costSoFar)
+                    {
+                        //If the G cost is lower, change the parent of the square to the current square, and recalculate the G and F scores of the
+                        // square.
+
+                        enemyNeighbor.cameFrom = current;
+                        enemyNeighbor.priority = EnemyNeighborDist(current.tile, enemyNeighbor.tile);
+                        enemyNeighbor.costSoFar = EnemyNeighborDist(start, enemyNeighbor.tile);
+
+                    }
+                    else
+                    {
+                        enemyNeighbor.priority = EnemyNeighborDist(current.tile, enemyNeighbor.tile);
+                        enemyNeighbor.costSoFar = EnemyNeighborDist(start, enemyNeighbor.tile);
+                        enemyNeighbor.remainingDist = EnemyNeighborDist(enemyNeighbor.tile, goal);
+
+                    }
+                }
             }
-
-
-            return RetracePath(current); // Trace through the path
         }
 
         return new Queue<Tile>(); // Returns an empty Path if no path is found
