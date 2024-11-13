@@ -268,7 +268,7 @@ public class Enemy : MonoBehaviour
                     Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile.Adjacents[3];
                     Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
 
-                    targetTile =  newTargetPath.Dequeue();
+                    targetTile = newTargetPath.Dequeue();
                     currentTile = targetTile;
 
                     state = EnemyState.CHASE;
