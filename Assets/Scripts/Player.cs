@@ -75,7 +75,11 @@ public class Player : MonoBehaviour
                 material.color = playerColor;
                 speed = slowSpeed;
 
-                if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, mapGenerator.goal);
+                if (path.Count <= 0)
+                {
+                    Queue<Tile> tiles = pathFinder.FindPathAStar(currentTile, mapGenerator.goal);
+                    path = tiles;
+                }
                 //if there is a path get next step then update target and go to moving state
                 if (path.Count > 0)
                 {
@@ -204,7 +208,7 @@ public class Player : MonoBehaviour
         explosion.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
-   
+
     public void Reset(Tile tile)
     {
         Debug.Log("Player reset");

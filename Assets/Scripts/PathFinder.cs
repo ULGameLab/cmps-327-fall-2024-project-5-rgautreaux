@@ -96,6 +96,7 @@ public class PathFinder
             {
                 Tile findNeighbors = nextTile;
                 Neighbors.Add(new Node(findNeighbors, 0, null, 0, 0));
+                //TODOList.Add(new Node(findNeighbors, 0, null, 0, 0));
                 Node neighbor = Neighbors[0];
 
 
@@ -338,7 +339,7 @@ public class PathFinder
                     {
                         foreach (Tile tile in adjacentList)
                         {
-                        if (tile != tileList[tileList.Count - 1])
+                        if (tile != tileList[^1])
                             {
                                 nextTile = tile;
                                 break;

@@ -174,13 +174,17 @@ public class Enemy : MonoBehaviour
 
                     //When Enemy2 sees the player, it selects the last tile the Player was at as their target tile.
 
-                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
-                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
+                    Tile player = playerGameObject.GetComponent<Player>().currentTile;
+                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, player);
 
-                    targetTile = newTargetPath.Dequeue();
-                    currentTile = targetTile;
+                    if(newTargetPath!= null)
+                    {
+                        targetTile = newTargetPath.Dequeue();
+                        currentTile = targetTile;
 
-                    state = EnemyState.CHASE;
+                        state = EnemyState.CHASE;
+                    }
+                      
                 }
 
                 break;
@@ -194,12 +198,12 @@ public class Enemy : MonoBehaviour
                 //Enemy will chase the player if it is nearby using pathfinder to find the path to that tile.
                 if (Vector3.Distance(transform.position, playerGameObject.transform.position) > 0.05f)
                 {
-                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
-                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
+                    Tile player = playerGameObject.GetComponent<Player>().currentTile;
+                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, player);
 
                     targetTile = newTargetPath.Dequeue();
                     currentTile = targetTile;
-                    if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, lastSeen);
+                    if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, player);
 
                     if (path.Count > 0)
                     {
@@ -265,8 +269,8 @@ public class Enemy : MonoBehaviour
                     //When Enemy3 sees the player,it selects a tile which is a few tiles away 
                     //(for example 2 tiles away) from the Player as their target tile.
 
-                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile.Adjacents[3];
-                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, lastSeen);
+                    Tile player = playerGameObject.GetComponent<Player>().currentTile.Adjacents[3];
+                    Queue<Tile> newTargetPath = pathFinder.FindPathAStar(currentTile, player);
 
                     targetTile = newTargetPath.Dequeue();
                     currentTile = targetTile;
@@ -286,8 +290,8 @@ public class Enemy : MonoBehaviour
                 if (Vector3.Distance(transform.position, playerGameObject.transform.position) > 0.05f)
                 {
                     //PURSUIT
-                    Tile lastSeen = playerGameObject.GetComponent<Player>().currentTile;
-                    if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, lastSeen);
+                    Tile player = playerGameObject.GetComponent<Player>().currentTile;
+                    if (path.Count <= 0) path = pathFinder.FindPathAStar(currentTile, player);
 
                     if (path.Count > 0)
                     {

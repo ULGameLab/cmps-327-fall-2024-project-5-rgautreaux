@@ -61,7 +61,7 @@ public class GenerateMap : MonoBehaviour
     public void GenerateNewMap()
     {
         mapTileList = null;
-        mapTileList = generateTilesList();
+        mapTileList = GenerateTilesList();
         tileList = null;
         tileList = new Tile[width, height];
         foreach (MapTile mapTile in mapTileList)
@@ -77,17 +77,17 @@ public class GenerateMap : MonoBehaviour
         ResetEnemies();
     }
 
-    MapTile[,] generateTilesList()
+    MapTile[,] GenerateTilesList()
     {
         MapTile[,] tiles;
         if (perlinGenerator)
         {
-            PerlinGenerator perlinGen = new PerlinGenerator();
+            PerlinGenerator perlinGen = new();
             tiles = perlinGen.MapGen(width, height, perlinConstraint);
         }
         else
         {
-            PrimGenerator primGen = new PrimGenerator();
+            PrimGenerator primGen = new();
             tiles = primGen.MapGen(width, height, primeConstraint);
         }
         return tiles;
