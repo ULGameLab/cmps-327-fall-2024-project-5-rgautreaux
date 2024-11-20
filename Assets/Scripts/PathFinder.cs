@@ -94,14 +94,9 @@ public class PathFinder
             // You just need to fill code inside this foreach only
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-                Tile findNeighbors = nextTile;
-                Neighbors.Add(new Node(findNeighbors, 0, null, 0, 0));
-                //TODOList.Add(new Node(findNeighbors, 0, null, 0, 0));
-                Node neighbor = Neighbors[0];
-
 
                 //If it is not walkable or if it is on the DONE list, ignore it.
-                if (DoneList.Contains(neighbor) || !current.tile.Adjacents.Contains(neighbor.tile))
+                if (DoneList.FindIndex(n => n.tile = nextTile) || !nextTile.isPassable)
                 {
                     //Move on to next neighbor
                     Neighbors.RemoveAt(0);
