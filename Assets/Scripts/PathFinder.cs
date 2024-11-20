@@ -91,6 +91,7 @@ public class PathFinder
             // You just need to fill code inside this foreach only
             foreach (Tile nextTile in current.tile.Adjacents)
             {
+
                 //If it is not walkable or if it is on the DONE list, ignore it.
                 if (DoneList.FindIndex(match: n => n.tile = nextTile) || !nextTile.isPassable)
                 {
@@ -116,22 +117,22 @@ public class PathFinder
                     // A lower G cost means that this is a better path.
 
                     TODOList.Sort((x, y) => (x.costSoFar.CompareTo(y.costSoFar))); //Resort the list to compare G score
-                    if (n.tile.costSoFar < current.costSoFar)
+                    if (nextTile.costSoFar < current.costSoFar)
                     {
                         //If the G cost is lower, change the parent of the square to the current square, and recalculate the G and F scores of the
                         // square.
 
-                        n.tile.cameFrom = current;
-                        n.tile.priority = HeuristicsDistance(current.tile, n.tile);
-                        n.tile.costSoFar = HeuristicsDistance(start, n.tile);
+                        nextTile.cameFrom = current;
+                        nextTile.priority = HeuristicsDistance(current.tile, nextTile);
+                        nextTile.costSoFar = HeuristicsDistance(start, nextTile);
 
                     }
                 }
                 else
                 {
-                    n.tile.priority = HeuristicsDistance(current.tile, n.tile);
-                    n.tile.costSoFar = HeuristicsDistance(start, n.tile);
-                    n.tile.remainingDist = HeuristicsDistance(n.tile, goal);
+                    nextTile.priority = HeuristicsDistance(current.tile, nextTile);
+                    nextTile.costSoFar = HeuristicsDistance(start, nextTile);
+                    nextTile.remainingDist = HeuristicsDistance(nextTile, goal);
                 }
             }
         }
@@ -200,11 +201,11 @@ public class PathFinder
                 else if (!TODOList.FindIndex(n => n.tile = nextTile))
                 {
                     TODOList.Add(n.tile);
-                    n.tile.cameFrom = current;
+                    nextEnemy.cameFrom = current;
 
-                    n.tile.priority = EnemyNeighborDist(current.tile, n.tile);
-                    n.tile.costSoFar = EnemyNeighborDist(start, n.tile);
-                    n.tile.remainingDist = EnemyNeighborDist(n.tile, goal);
+                    nextEnemy.priority = EnemyNeighborDist(current.tile, nextEnemy);
+                    nextEnemy.costSoFar = EnemyNeighborDist(start, nextEnemy);
+                    nextEnemy.remainingDist = EnemyNeighborDist(nextEnemy, goal);
 
                 }
                 // If it is on the TODO list already, check to see if this path to that square is better,using G
@@ -220,15 +221,15 @@ public class PathFinder
                         // square.
 
                         n.tile.cameFrom = current;
-                        n.tile.priority = EnemyNeighborDist(current.tile, n.tile);
-                        n.tile.costSoFar = EnemyNeighborDist(start, n.tile);
+                        n.tile.priority = EnemyNeighborDist(current.tile, nextEnemy);
+                        n.tile.costSoFar = EnemyNeighborDist(start, nextEnemy);
 
                     }
                     else
                     {
-                        n.tile.priority = EnemyNeighborDist(current.tile, n.tile);
-                        n.tile.costSoFar = EnemyNeighborDist(start, n.tile);
-                        n.tile.remainingDist = EnemyNeighborDist(n.tile, goal);
+                        n.tile.priority = EnemyNeighborDist(current.tile, nextEnemy);
+                        n.tile.costSoFar = EnemyNeighborDist(start, nextEnemy);
+                        n.tile.remainingDist = EnemyNeighborDist(nextEnemy, goal);
 
                     }
                 }
