@@ -52,6 +52,7 @@ public class PathFinder
     public List<Node> EnemyPath = new();
     public Tile goalTile;
     public GameObject enemyGameObject;
+    private Tile nextTile;
 
 
     // This is the constructor
@@ -200,7 +201,7 @@ public class PathFinder
                 // this square.Record the F, G, and H costs of the square
                 else if (!TODOList.FindIndex(n => n.tile = nextTile))
                 {
-                    TODOList.Add(n.tile);
+                    TODOList.Add(nextEnemy);
                     nextEnemy.cameFrom = current;
 
                     nextEnemy.priority = EnemyNeighborDist(current.tile, nextEnemy);
